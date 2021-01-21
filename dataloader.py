@@ -37,6 +37,7 @@ class PolypDataset(Dataset):
                 transforms.ToPILImage(),
                 transforms.Resize(self.input_size, Image.BICUBIC),
                 transforms.ToTensor(),
+                # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
             ]
         )
 
@@ -47,6 +48,7 @@ class PolypDataset(Dataset):
                 transforms.Resize(self.input_size, Image.BICUBIC),
                 transforms.Grayscale(num_output_channels=1),
                 transforms.ToTensor(),
+                # transforms.Normalize((0.5),(0.5))
             ]
         )
 
@@ -54,7 +56,7 @@ class PolypDataset(Dataset):
 input_size = (128, 128)
 
 # Create train and validation sets
-train_images_file = "/home/raman/Downloads/doubleunet/data/train_images.txt"
+train_images_file = "data/train_images.txt"
 train_labels_file = "data/train_masks.txt"
 val_images_file = "data/val_images.txt"
 val_labels_file = "data/val_masks.txt"

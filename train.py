@@ -7,7 +7,10 @@ from tqdm import tqdm
 from dataloader import random_seed, train_loader, val_loader, batch_size
 from loss import DiceBCELoss
 from model import NestedUNet
+from tensorboardX import SummaryWriter
 
+
+writer = SummaryWriter()
 def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learning_rate, patience, model_path, device):
     """
     Function to train a u-net model for segmentation.
@@ -53,6 +56,7 @@ def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learn
             features, labels = features.to(device), labels.to(device)
             output = model.forward(features)
             loss = criterion(output, labels)
+            writer.add_scalar('loss/train', )
             loss.backward()
             optimiser.step()
             current_train_loss += loss.item()
@@ -121,7 +125,7 @@ def main():
     save_path = os.path.join(output_dir, "polyp_unet1.pth")
     # Initiliase Model
     torch.manual_seed(random_seed)
-    model = NestedUNet(num_classes=1,input_channels= 3,bilinear=True).to('cuda')
+    model = NestedUNet(num_classes=1,input_channels= 3,deep_supervision=True).to('cuda')
 
     # Hyperparameters
     num_epochs = 200
