@@ -5,12 +5,15 @@ import torch
 from torch import optim
 from tqdm import tqdm
 from dataloader import random_seed, train_loader, val_loader, batch_size
-from loss import DiceBCELoss
+# from loss import DiceBCELoss
+from losses import BCEDiceLoss
 from model import NestedUNet
 from tensorboardX import SummaryWriter
+from metrics import iou_score
 
 
-writer = SummaryWriter()
+
+writer = SummaryWriter("runs/first")
 def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learning_rate, patience, model_path, device):
     """
     Function to train a u-net model for segmentation.
@@ -33,7 +36,7 @@ def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learn
     val_losses = []
 
     # Loss function
-    criterion = DiceBCELoss().to(device)
+    criterion = BCEDiceLoss().to(device)
 
     # Optimiser
     optimiser = optim.SGD(model.parameters(), lr=learning_rate)
@@ -56,11 +59,10 @@ def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learn
             features, labels = features.to(device), labels.to(device)
             output = model.forward(features)
             loss = criterion(output, labels)
-            writer.add_scalar('loss/train', )
+            writer.add_scalar('trianing loss',loss )
             loss.backward()
             optimiser.step()
             current_train_loss += loss.item()
-
             del features, labels
             gc.collect()
             torch.cuda.empty_cache()
@@ -72,6 +74,7 @@ def train(model, train_dataloader, val_dataloader, batch_size, num_epochs, learn
                 features, labels = features.to(device), labels.to(device)
                 output = model.forward(features)
                 loss = criterion(output, labels)
+                writer.add_scalar('validation loss',loss)
                 current_val_loss += loss.item()
 
                 del features, labels
@@ -122,14 +125,15 @@ def main():
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    save_path = os.path.join(output_dir, "polyp_unet1.pth")
+    save_path = os.path.join(output_dir, "polyp_unet_deep.pth")
     # Initiliase Model
     torch.manual_seed(random_seed)
     model = NestedUNet(num_classes=1,input_channels= 3,deep_supervision=True).to('cuda')
 
     # Hyperparameters
     num_epochs = 200
-    learning_rate = 0.0001
+    # learning_rate = 0.0001
+    learning_rate = 0.001
     patience = 10
 
     # Initiliase Model
@@ -139,7 +143,6 @@ def main():
     # Train model
     best_model_params = train(model, train_loader, val_loader, batch_size, num_epochs,
                               learning_rate, patience, save_path, device)
-
     print("Training complete.")
 
     # Delete model to free memory
@@ -147,6 +150,6 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
-
+writer.close()
 if __name__ == "__main__":
     main()

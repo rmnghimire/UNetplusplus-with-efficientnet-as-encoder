@@ -11,6 +11,7 @@ import efficientnet
 model2 = efficientnet.efficientnet(net="B3", pretrained=True).to('cuda')
 
 
+
 class VGGBlock(nn.Module):
     def __init__(self, in_channels, middle_channels, out_channels):
         super().__init__()
@@ -85,6 +86,7 @@ class NestedUNet(nn.Module):
             self.final = nn.Conv2d(nb_filter[0], num_classes, kernel_size=1)
 
 
+
     def forward(self, input):
         # x0_0 = self.conv0_0(input)
         x0 = model2.features[0:0](input)
@@ -131,24 +133,24 @@ class NestedUNet(nn.Module):
         # print(self.up1(x4_0).shape,"aa")
 
         if self.deep_supervision:
-            # output1 = self.final1(x0_1)
-            # output2 = self.final2(x0_2)
-            # output3 = self.final3(x0_3)
-            # output4 = self.final4(x0_4)
-            t1 = self.new(self.up1(x4_0))
-            t2 = self.new1(self.up2(x3_1))
-            t3 = self.new2(self.up3(x2_2))
-            t4 = self.new3(self.up(x1_3))
-            tfinal = torch.cat([t1,t2,t3,t4,x0_4],1)
-            y=torch.mean(tfinal,1, keepdim=True)
+            output1 = self.final1(x0_1)
+            output2 = self.final2(x0_2)
+            output3 = self.final3(x0_3)
+            output4 = self.final4(x0_4)
+            # t1 = self.new(self.up1(x4_0))
+            # t2 = self.new1(self.up2(x3_1))
+            # t3 = self.new2(self.up3(x2_2))
+            # t4 = self.new3(self.up(x1_3))
+            # tfinal = torch.cat([t1,t2,t3,t4,x0_4],1)
+            # y=torch.mean(tfinal,1, keepdim=True)
 
              # t = self.conv0_1( self.up(x1_0))
 
 
-            # y = torch.cat([output1, output2, output3, output4],1)
+            y = torch.cat([output1, output2, output3, output4],1)
             # # print(y.shape)
-            # y=torch.mean(y,1, keepdim=True)
-            # # print(y.shape)
+            y=torch.mean(y,1, keepdim=True)
+            # print(y.shape)
             return y
         else:
             output = self.final(x0_4)
