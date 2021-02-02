@@ -69,31 +69,24 @@ def predict_mask(input, threshold):
 # Threshold for prediction
 threshold = 0.6
 
-# Get test image
-# input, label, idx = next(iter(img_t))
-
 pred = predict_mask(img, threshold)
-rat = torch.squeeze(torch.from_numpy(pred),0).permute(1,2,0)
-im1
-# rat = np.array(rat)
-# rat = pred.squeeze()
+reat = pred[0,0] * 255
+reat = cv.convertScaleAbs(reat)
+cv.imwrite("pred.jpg",reat)
 
-# original = cv.imread(rat)
-cv.imshow("aayp", rat)
-# print(pred.shape, "pred")
+# rat = torch.squeeze(torch.from_numpy(pred),0).permute(1,2,0)
 # print(rat.shape, "rat")
-# cv.imshow("aay", label)
-
-# cv.imwrite("3.jpg",rat)
-# print(pred.shape)
-# # pred = np.array(pred)
-# cv.imwrite("avb", pred)
-# import matplotlib.pyplot as plt
-# import matplotlib.image as mpimg
-# img = mpimg.imread('your_image.png')
-# imgplot = plt.imshow(img)
-# plt.show()
+# rat = np.array(pred)
+# print(rat.shape, "rat2")
+# rat= rat*255
+# print(rat.shape, "sjap[e")
+# cv.imshow("aayp", rat)
+cv.waitKey(0)
+# rat= cv.convertScaleAbs(rat)
+# cv.imwrite("filename.jpg",rat)
 def visualize(input, pred):
+    img = pred.squeeze()
+
     fig, axes = plt.subplots(1, 2, figsize=(15, 7), dpi=80, sharex=True, sharey=True)
     titles = ['Input', 'Prediction']
     image_sets = [input, pred, label]
@@ -104,9 +97,11 @@ def visualize(input, pred):
 
         else:
             img = image_sets[i].squeeze()
-
+            # a = np.array((img*255))
+            # a = cv.convertScaleAbs((a))
+            # cv.imshow("arr",a)
         axis.imshow(img, cmap = 'gray')
-        # plt.savefig("aaup.jpg")
+
         axis.set_title(titles[i])
         # plt.savefig("aaup1.jpg")
 
